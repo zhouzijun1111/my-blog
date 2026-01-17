@@ -4,8 +4,11 @@ FROM node:18-alpine AS builder
 # 设置工作目录
 WORKDIR /app
 
-# 复制 package.json 和 pnpm-lock.yaml
-COPY package*.json pnpm-lock.yaml ./
+# 复制根目录的 workspace 和 lock 文件
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+
+# 复制后端 package.json
+COPY packages/backend/package.json ./packages/backend/
 
 # 安装 pnpm
 RUN npm install -g pnpm@8
@@ -13,11 +16,11 @@ RUN npm install -g pnpm@8
 # 安装依赖
 RUN pnpm install --frozen-lockfile
 
-# 复制源码和 Prisma schema
-COPY . .
-COPY prisma ./prisma/
+# 复制后端源码
+COPY packages/backend ./packages/backend/
 
 # 生成 Prisma Client
+WORKDIR /app/packages/backend
 RUN npx prisma generate
 
 # 构建项目
@@ -32,16 +35,17 @@ WORKDIR /app
 # 安装 pnpm
 RUN npm install -g pnpm@8
 
-# 复制 package.json 和 pnpm-lock.yaml
-COPY package*.json pnpm-lock.yaml ./
+# 复制根目录的 workspace 和 lock 文件
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY packages/backend/package.json ./packages/backend/
 
 # 仅安装生产依赖
 RUN pnpm install --prod --frozen-lockfile
 
 # 从构建阶段复制文件
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/packages/backend/dist ./dist
+COPY --from=builder /app/packages/backend/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/packages/backend/prisma ./prisma
 
 # 创建非 root 用户
 RUN addgroup -g 1001 -S nodejs && \

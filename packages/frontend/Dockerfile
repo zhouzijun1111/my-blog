@@ -4,8 +4,11 @@ FROM node:18-alpine AS builder
 # 设置工作目录
 WORKDIR /app
 
-# 复制 package.json 和 pnpm-lock.yaml
-COPY package*.json pnpm-lock.yaml ./
+# 复制根目录的 workspace 和 lock 文件
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+
+# 复制前端 package.json
+COPY packages/frontend/package.json ./packages/frontend/
 
 # 安装 pnpm
 RUN npm install -g pnpm@8
@@ -13,10 +16,11 @@ RUN npm install -g pnpm@8
 # 安装依赖
 RUN pnpm install --frozen-lockfile
 
-# 复制源码
-COPY . .
+# 复制前端源码
+COPY packages/frontend ./packages/frontend/
 
 # 构建项目
+WORKDIR /app/packages/frontend
 RUN pnpm run build
 
 # ==================== 生产阶段 ====================
@@ -26,10 +30,10 @@ FROM nginx:alpine
 RUN apk add --no-cache curl
 
 # 复制自定义 nginx 配置
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY packages/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # 从构建阶段复制构建产物
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/packages/frontend/dist /usr/share/nginx/html
 
 # 创建非 root 用户
 RUN addgroup -g 1001 -S nginx-user && \
