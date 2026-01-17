@@ -14,7 +14,7 @@ COPY packages/frontend/package.json ./packages/frontend/
 RUN npm install -g pnpm@8
 
 # 安装依赖
-RUN pnpm install --frozen-lockfile
+RUN pnpm install 
 
 # 复制前端源码
 COPY packages/frontend ./packages/frontend/
