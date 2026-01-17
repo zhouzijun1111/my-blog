@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { CategoryService } from '../services/category.service'
+import { authenticateToken } from '../middleware/auth'
 
 /**
  * 分类路由
@@ -43,7 +44,7 @@ export async function categoryRoutes(fastify: FastifyInstance) {
 
   // 创建分类（需要认证）
   fastify.post('/api/categories', {
-    onRequest: [fastify.authenticate]
+    onRequest: [authenticateToken]
   }, async (request, reply) => {
     try {
       const data = request.body as { name: string; slug: string }
@@ -60,7 +61,7 @@ export async function categoryRoutes(fastify: FastifyInstance) {
 
   // 更新分类（需要认证）
   fastify.put('/api/categories/:id', {
-    onRequest: [fastify.authenticate]
+    onRequest: [authenticateToken]
   }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
@@ -84,7 +85,7 @@ export async function categoryRoutes(fastify: FastifyInstance) {
 
   // 删除分类（需要认证）
   fastify.delete('/api/categories/:id', {
-    onRequest: [fastify.authenticate]
+    onRequest: [authenticateToken]
   }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string }

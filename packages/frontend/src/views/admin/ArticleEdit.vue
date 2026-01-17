@@ -140,6 +140,7 @@ import {
 import { useArticleStore } from '@/stores/article'
 import { articleApi, categoryApi, tagApi } from '@/api'
 import MarkdownIt from 'markdown-it'
+import DOMPurify from 'isomorphic-dompurify'
 
 const route = useRoute()
 const router = useRouter()
@@ -257,7 +258,14 @@ const handleSubmit = async () => {
 }
 
 const handleContentInput = () => {
-  previewHtml.value = md.render(form.value.content)
+  const rawHtml = md.render(form.value.content)
+  // 使用 DOMPurify 清理 HTML，防止 XSS 攻击
+  previewHtml.value = DOMPurify.sanitize(rawHtml, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'code', 'pre',
+                   'blockquote', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4',
+                   'h5', 'h6', 'img', 'table', 'thead', 'tbody', 'tr', 'td', 'th'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'id', 'title']
+  })
 }
 
 const previewMarkdown = () => {

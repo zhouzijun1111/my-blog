@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { TagService } from '../services/tag.service'
+import { authenticateToken } from '../middleware/auth'
 
 /**
  * 标签路由
@@ -43,7 +44,7 @@ export async function tagRoutes(fastify: FastifyInstance) {
 
   // 创建标签（需要认证）
   fastify.post('/api/tags', {
-    onRequest: [fastify.authenticate]
+    onRequest: [authenticateToken]
   }, async (request, reply) => {
     try {
       const data = request.body as { name: string; slug: string }
@@ -60,7 +61,7 @@ export async function tagRoutes(fastify: FastifyInstance) {
 
   // 更新标签（需要认证）
   fastify.put('/api/tags/:id', {
-    onRequest: [fastify.authenticate]
+    onRequest: [authenticateToken]
   }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
@@ -84,7 +85,7 @@ export async function tagRoutes(fastify: FastifyInstance) {
 
   // 删除标签（需要认证）
   fastify.delete('/api/tags/:id', {
-    onRequest: [fastify.authenticate]
+    onRequest: [authenticateToken]
   }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string }

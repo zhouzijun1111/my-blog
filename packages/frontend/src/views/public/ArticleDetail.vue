@@ -83,6 +83,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useArticleStore } from '@/stores/article'
 import MarkdownIt from 'markdown-it'
+import DOMPurify from 'isomorphic-dompurify'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github.css'
 import ArrowLeftIcon from '@/components/icons/ArrowLeftIcon.vue'
@@ -141,7 +142,20 @@ const md = new MarkdownIt({
 const article = computed(() => articleStore.currentArticle)
 
 const renderedContent = computed(() => {
-  return article.value ? md.render(article.value.content) : ''
+  if (!article.value) return ''
+  const rawHtml = md.render(article.value.content)
+  // 使用 DOMPurify 清理 HTML，防止 XSS 攻击
+  return DOMPurify.sanitize(rawHtml, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'code', 'pre',
+                   'blockquote', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4',
+                   'h5', 'h6', 'img', 'table', 'thead', 'tbody', 'tr', 'td', 'th',
+                   'div', 'span', 'hr', 'button', 'svg', 'path', 'rect'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'id', 'title', 'target', 'rel',
+                   'data-language', 'viewBox', 'width', 'height', 'fill', 'stroke',
+                   'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'xmlns', 'x', 'y', 'rx', 'ry'],
+    ALLOW_DATA_ATTR: false,
+    ADD_ATTR: ['onclick']  // 仅用于代码复制功能
+  })
 })
 
 const formatDate = (date: string) => {
