@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# 禁止爬取管理员后台
+Disallow: /admin
+Disallow: /api
+
+# 禁止爬取私有路径
+Disallow: /login
+Disallow: /register
