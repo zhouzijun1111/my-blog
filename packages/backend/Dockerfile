@@ -29,8 +29,8 @@ RUN pnpm run build
 # ==================== 生产阶段 ====================
 FROM node:18-alpine
 
-# 设置工作目录
-WORKDIR /app
+# 设置工作目录为后端目录
+WORKDIR /app/packages/backend
 
 # 安装 pnpm
 RUN npm install -g pnpm@8
