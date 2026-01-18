@@ -35,17 +35,17 @@ WORKDIR /app
 # 安装 pnpm
 RUN npm install -g pnpm@8
 
-# 复制根目录的 workspace 和 lock 文件
+# 复制根目录的 workspace 配置
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages/backend/package.json ./packages/backend/
 
-# 仅安装生产依赖
-RUN pnpm install --prod 
+# 从构建阶段复制所有 node_modules（包括生产依赖）
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/backend/node_modules ./packages/backend/node_modules
 
-# 从构建阶段复制文件
-COPY --from=builder /app/packages/backend/dist ./dist
-COPY --from=builder /app/packages/backend/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/packages/backend/prisma ./prisma
+# 从构建阶段复制构建产物
+COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
+COPY --from=builder /app/packages/backend/prisma ./packages/backend/prisma
 
 # 创建非 root 用户
 RUN addgroup -g 1001 -S nodejs && \
