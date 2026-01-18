@@ -1,5 +1,8 @@
 import { FastifyInstance } from 'fastify'
 import { ArticleService } from '../services/article.service'
+import { authenticateToken } from '../middleware/auth'
+import { validateBody, validateQuery, articleSchemas, paginationQuerySchema } from '../middleware/validation'
+import type { AuthenticatedRequest } from '../types'
 
 /**
  * 文章路由
@@ -9,7 +12,9 @@ export async function articleRoutes(fastify: FastifyInstance) {
   const articleService = new ArticleService(fastify.prisma)
 
   // 获取文章列表
-  fastify.get('/api/articles', async (request, reply) => {
+  fastify.get('/api/articles', {
+    preHandler: validateQuery(paginationQuerySchema)
+  }, async (request, reply) => {
     try {
       const { page = '1', pageSize = '10', published } = request.query as any
       const result = await articleService.getList({
@@ -74,10 +79,11 @@ export async function articleRoutes(fastify: FastifyInstance) {
 
   // 创建文章（需要认证）
   fastify.post('/api/articles', {
-    onRequest: [fastify.authenticate]
+    onRequest: [authenticateToken],
+    preHandler: validateBody(articleSchemas.create)
   }, async (request, reply) => {
     try {
-      const userId = (request as any).user.id
+      const userId = (request as AuthenticatedRequest).user.id
       const data = request.body as any
 
       const article = await articleService.create({
@@ -103,11 +109,12 @@ export async function articleRoutes(fastify: FastifyInstance) {
 
   // 更新文章（需要认证）
   fastify.put('/api/articles/:id', {
-    onRequest: [fastify.authenticate]
+    onRequest: [authenticateToken],
+    preHandler: validateBody(articleSchemas.update)
   }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
-      const userId = (request as any).user.id
+      const userId = (request as AuthenticatedRequest).user.id
       const data = request.body as any
 
       const article = await articleService.update(id, userId, {
@@ -144,11 +151,11 @@ export async function articleRoutes(fastify: FastifyInstance) {
 
   // 删除文章（需要认证）
   fastify.delete('/api/articles/:id', {
-    onRequest: [fastify.authenticate]
+    onRequest: [authenticateToken]
   }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
-      const userId = (request as any).user.id
+      const userId = (request as AuthenticatedRequest).user.id
       await articleService.delete(id, userId)
 
       return { success: true, message: '文章已删除' }

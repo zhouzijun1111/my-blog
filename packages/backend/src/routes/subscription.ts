@@ -5,6 +5,17 @@ import { validateBody } from '../middleware/validation'
 import { z } from 'zod'
 
 /**
+ * 订阅请求体类型
+ */
+interface SubscribeBody {
+  email: string
+}
+
+interface UnsubscribeBody {
+  email: string
+}
+
+/**
  * 订阅路由
  * 定义所有订阅相关的 API 端点
  */
@@ -21,7 +32,7 @@ export async function subscriptionRoutes(fastify: FastifyInstance) {
     preHandler: validateBody(subscribeSchema)
   }, async (request, reply) => {
     try {
-      const { email } = request.body as any
+      const { email } = request.body as SubscribeBody
 
       const result = await subscriptionService.subscribe(email)
 
@@ -77,7 +88,7 @@ export async function subscriptionRoutes(fastify: FastifyInstance) {
     preHandler: validateBody(subscribeSchema)
   }, async (request, reply) => {
     try {
-      const { email } = request.body as any
+      const { email } = request.body as UnsubscribeBody
 
       const result = await subscriptionService.unsubscribe(email)
 
@@ -122,7 +133,7 @@ export async function subscriptionRoutes(fastify: FastifyInstance) {
     onRequest: [authenticateToken]
   }, async (request, reply) => {
     try {
-      const { page = '1', pageSize = '20' } = request.query as any
+      const { page = '1', pageSize = '20' } = request.query as { page?: string; pageSize?: string }
 
       const result = await subscriptionService.getAllSubscribers(
         parseInt(page),

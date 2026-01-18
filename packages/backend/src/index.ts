@@ -7,6 +7,7 @@ import { env } from './config/env'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
 import { authenticateToken } from './middleware/auth'
 import { validateBody, authSchemas } from './middleware/validation'
+import { setupRateLimit } from './middleware/rateLimit'
 import { AuthService } from './services/auth.service'
 import { commentRoutes } from './routes/comments'
 import { subscriptionRoutes } from './routes/subscription'
@@ -15,6 +16,21 @@ import { robotsRoutes } from './routes/robots'
 import { articleRoutes } from './routes/articles'
 import { categoryRoutes } from './routes/categories'
 import { tagRoutes } from './routes/tags'
+import type { AuthenticatedRequest } from './types'
+
+/**
+ * 认证请求体类型
+ */
+interface RegisterBody {
+  email: string
+  username: string
+  password: string
+}
+
+interface LoginBody {
+  email: string
+  password: string
+}
 
 const prisma = new PrismaClient()
 const server = Fastify({
@@ -68,6 +84,9 @@ async function start() {
   await server.register(jwt, {
     secret: env.JWT_SECRET,
   })
+
+  // 速率限制配置（防止 DoS 和暴力破解）
+  await setupRateLimit(server)
 
   // 全局错误处理
   server.setErrorHandler(errorHandler)
@@ -123,7 +142,7 @@ async function start() {
     preHandler: validateBody(authSchemas.register)
   }, async (request, reply) => {
     try {
-      const { email, username, password } = request.body as any
+      const { email, username, password } = request.body as RegisterBody
       const user = await authService.register(email, username, password)
 
       // 生成 JWT token
@@ -146,7 +165,7 @@ async function start() {
     preHandler: validateBody(authSchemas.login)
   }, async (request, reply) => {
     try {
-      const { email, password } = request.body as any
+      const { email, password } = request.body as LoginBody
       const user = await authService.login(email, password)
 
       // 生成 JWT token
@@ -166,18 +185,9 @@ async function start() {
   })
 
   server.get('/api/auth/me', {
-    onRequest: [async (request, reply) => {
-      try {
-        await request.jwtVerify()
-      } catch (_err) {
-        return reply.status(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: '未授权访问' }
-        })
-      }
-    }]
+    onRequest: [authenticateToken]
   }, async (request) => {
-    const userId = (request.user as any).id
+    const userId = (request as AuthenticatedRequest).user.id
     const user = await authService.getUserById(userId)
     return { success: true, data: user }
   })

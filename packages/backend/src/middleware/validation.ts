@@ -95,3 +95,67 @@ export const authSchemas = {
     password: z.string().min(1, '密码不能为空')
   })
 }
+
+// 文章相关验证 Schema
+export const articleSchemas = {
+  create: z.object({
+    title: z.string().min(1, '标题不能为空').max(200, '标题最多200字符'),
+    slug: z.string().min(1, 'slug不能为空').max(100, 'slug最多100字符')
+      .regex(/^[a-z0-9-]+$/, 'slug只能包含小写字母、数字和连字符'),
+    content: z.string().min(1, '内容不能为空'),
+    excerpt: z.string().max(500, '摘要最多500字符').optional(),
+    coverImage: z.string().url('封面图片必须是有效URL').optional(),
+    published: z.boolean().optional(),
+    categoryId: z.string().uuid('分类ID格式不正确'),
+    tagIds: z.array(z.string().uuid('标签ID格式不正确')).optional()
+  }),
+
+  update: z.object({
+    title: z.string().min(1, '标题不能为空').max(200, '标题最多200字符').optional(),
+    slug: z.string().min(1, 'slug不能为空').max(100, 'slug最多100字符')
+      .regex(/^[a-z0-9-]+$/, 'slug只能包含小写字母、数字和连字符').optional(),
+    content: z.string().min(1, '内容不能为空').optional(),
+    excerpt: z.string().max(500, '摘要最多500字符').optional(),
+    coverImage: z.string().url('封面图片必须是有效URL').optional(),
+    published: z.boolean().optional(),
+    categoryId: z.string().uuid('分类ID格式不正确').optional(),
+    tagIds: z.array(z.string().uuid('标签ID格式不正确')).optional()
+  })
+}
+
+// 分类相关验证 Schema
+export const categorySchemas = {
+  create: z.object({
+    name: z.string().min(1, '名称不能为空').max(50, '名称最多50字符'),
+    slug: z.string().min(1, 'slug不能为空').max(50, 'slug最多50字符')
+      .regex(/^[a-z0-9-]+$/, 'slug只能包含小写字母、数字和连字符')
+  }),
+
+  update: z.object({
+    name: z.string().min(1, '名称不能为空').max(50, '名称最多50字符').optional(),
+    slug: z.string().min(1, 'slug不能为空').max(50, 'slug最多50字符')
+      .regex(/^[a-z0-9-]+$/, 'slug只能包含小写字母、数字和连字符').optional()
+  })
+}
+
+// 标签相关验证 Schema（同分类）
+export const tagSchemas = {
+  create: z.object({
+    name: z.string().min(1, '名称不能为空').max(50, '名称最多50字符'),
+    slug: z.string().min(1, 'slug不能为空').max(50, 'slug最多50字符')
+      .regex(/^[a-z0-9-]+$/, 'slug只能包含小写字母、数字和连字符')
+  }),
+
+  update: z.object({
+    name: z.string().min(1, '名称不能为空').max(50, '名称最多50字符').optional(),
+    slug: z.string().min(1, 'slug不能为空').max(50, 'slug最多50字符')
+      .regex(/^[a-z0-9-]+$/, 'slug只能包含小写字母、数字和连字符').optional()
+  })
+}
+
+// 分页查询参数验证 Schema
+export const paginationQuerySchema = z.object({
+  page: z.string().optional().default('1'),
+  pageSize: z.string().optional().default('10'),
+  published: z.string().optional()
+})

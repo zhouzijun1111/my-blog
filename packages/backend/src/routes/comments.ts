@@ -3,6 +3,21 @@ import { CommentService } from '../services/comment.service'
 import { authenticateToken } from '../middleware/auth'
 import { validateBody } from '../middleware/validation'
 import { z } from 'zod'
+import type { AuthenticatedRequest } from '../types'
+
+/**
+ * 评论请求体类型
+ */
+interface CreateCommentBody {
+  content: string
+  author: string
+  email?: string
+  parentId?: string
+}
+
+interface UpdateCommentStatusBody {
+  status: 'PENDING' | 'APPROVED' | 'SPAM'
+}
 
 /**
  * 评论路由
@@ -53,7 +68,7 @@ export async function commentRoutes(fastify: FastifyInstance) {
   }, async (request, reply) => {
     try {
       const { slug } = request.params as { slug: string }
-      const body = request.body as any
+      const body = request.body as CreateCommentBody
 
       const comment = await commentService.create({
         content: body.content,
@@ -106,7 +121,7 @@ export async function commentRoutes(fastify: FastifyInstance) {
     onRequest: [authenticateToken]
   }, async (request, reply) => {
     try {
-      const { page = '1', pageSize = '20' } = request.query as any
+      const { page = '1', pageSize = '20' } = request.query as { page?: string; pageSize?: string }
 
       const result = await commentService.getAllComments(
         parseInt(page),
@@ -135,7 +150,7 @@ export async function commentRoutes(fastify: FastifyInstance) {
   }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
-      const { status } = request.body as any
+      const { status } = request.body as UpdateCommentStatusBody
 
       const comment = await commentService.updateStatus(id, status)
 

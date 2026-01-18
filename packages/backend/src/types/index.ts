@@ -10,18 +10,11 @@ export interface JwtUser {
 }
 
 /**
- * 扩展 FastifyRequest 类型，添加 user 属性
- */
-declare module 'fastify' {
-  interface FastifyRequest {
-    user: JwtUser | undefined
-  }
-}
-
-/**
  * 认证后的请求类型（确保 user 存在）
+ * 注意：user 属性由 @fastify/jwt 提供，类型为 string | object | Buffer
+ * 使用时需要进行类型断言或类型守卫
  */
-export interface AuthenticatedRequest extends FastifyRequest {
+export interface AuthenticatedRequest extends Omit<FastifyRequest, 'user'> {
   user: JwtUser
 }
 
