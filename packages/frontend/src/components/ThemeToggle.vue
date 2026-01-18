@@ -8,8 +8,8 @@
         @change="toggleTheme"
       />
       <div class="slider round">
-        <span class="icon sun">☀️</span>
-        <span class="icon moon">🌙</span>
+        <SunIcon class="icon sun" />
+        <MoonIcon class="icon moon" />
       </div>
     </label>
   </div>
@@ -17,6 +17,8 @@
 
 <script setup lang="ts">
 import { useTheme } from '@/composables/useTheme'
+import SunIcon from '@/components/icons/SunIcon.vue'
+import MoonIcon from '@/components/icons/MoonIcon.vue'
 
 const { isDark, toggleTheme } = useTheme()
 </script>
@@ -77,9 +79,11 @@ input:checked + .slider {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 14px;
+  width: 16px;
+  height: 16px;
   z-index: 1;
-  transition: opacity 0.3s;
+  transition: opacity var(--duration-300);
+  color: white;
 }
 
 .sun {

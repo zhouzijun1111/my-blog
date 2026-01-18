@@ -5,7 +5,7 @@
         <div class="search-modal-container" @click.stop>
           <!-- 搜索输入框 -->
           <div class="search-input-wrapper">
-            <span class="search-icon">🔍</span>
+            <SearchIcon class="search-icon" />
             <input
               ref="searchInputRef"
               v-model="searchQuery"
@@ -35,7 +35,7 @@
                 class="history-item"
                 @click="searchHistoryItem(item)"
               >
-                <span class="history-icon">🕐</span>
+                <ClockIcon class="history-icon" />
                 <span class="history-text">{{ item }}</span>
                 <span class="history-arrow">→</span>
               </button>
@@ -74,12 +74,14 @@
                 :class="{ highlighted: index === highlightedIndex }"
                 @click="goToArticle(item.slug)"
               >
-                <div class="result-icon">📄</div>
+                <DocumentIcon class="result-icon" />
                 <div class="result-content">
                   <div class="result-title">{{ highlightMatch(item.title) }}</div>
                   <div class="result-meta">
                     <span class="result-category">{{ item.category?.name }}</span>
-                    <span class="result-views">👁️ {{ item.views }}</span>
+                    <span class="result-views">
+                      <EyeIcon /> {{ item.views }}
+                    </span>
                   </div>
                 </div>
                 <span class="result-arrow">→</span>
@@ -89,7 +91,7 @@
 
           <!-- 无结果 -->
           <div v-if="searchQuery && !loading && searchResults.length === 0" class="empty-state">
-            <div class="empty-icon">🔍</div>
+            <SearchIcon class="empty-icon" />
             <h3>未找到相关内容</h3>
             <p>尝试使用其他关键词搜索</p>
           </div>
@@ -119,6 +121,10 @@ import { ref, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { searchApi } from '@/api'
 import { useDebounceFn } from '@vueuse/core'
+import SearchIcon from '@/components/icons/SearchIcon.vue'
+import ClockIcon from '@/components/icons/ClockIcon.vue'
+import DocumentIcon from '@/components/icons/DocumentIcon.vue'
+import EyeIcon from '@/components/icons/EyeIcon.vue'
 
 const props = defineProps<{
   show: boolean
@@ -354,7 +360,8 @@ if (typeof window !== 'undefined') {
 }
 
 .search-icon {
-  font-size: 1.5rem;
+  width: 20px;
+  height: 20px;
   opacity: 0.5;
 }
 
@@ -452,7 +459,8 @@ if (typeof window !== 'undefined') {
 }
 
 .history-icon {
-  font-size: 1rem;
+  width: 16px;
+  height: 16px;
   opacity: 0.6;
 }
 
@@ -519,7 +527,8 @@ if (typeof window !== 'undefined') {
 }
 
 .result-icon {
-  font-size: 1.25rem;
+  width: 20px;
+  height: 20px;
   opacity: 0.7;
 }
 
@@ -591,7 +600,8 @@ if (typeof window !== 'undefined') {
 }
 
 .empty-icon {
-  font-size: 3rem;
+  width: 48px;
+  height: 48px;
   margin-bottom: 1rem;
   opacity: 0.4;
 }
