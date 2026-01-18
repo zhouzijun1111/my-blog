@@ -13,7 +13,7 @@ COPY packages/backend/package.json ./packages/backend/
 # 安装 pnpm
 RUN npm install -g pnpm@8
 
-# 安装依赖
+# 安装所有依赖
 RUN pnpm install
 
 # 复制后端源码
@@ -34,11 +34,22 @@ WORKDIR /app
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# 从构建阶段复制构建产物（只复制必要的文件）
+# 复制后端 package.json
+COPY --chown=nodejs:nodejs packages/backend/package.json ./package.json
+
+# 安装 pnpm
+RUN npm install -g pnpm@8
+
+# 复制 pnpm workspace 文件
+COPY --chown=nodejs:nodejs pnpm-workspace.yaml pnpm-lock.yaml ./
+
+# 安装生产依赖（使用 pnpm 生成正确的 symlinks）
+RUN --mount=type=cache,target=/root/.pnpm-store \
+    pnpm install --prod --frozen-lockfile
+
+# 从构建阶段复制构建产物
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/prisma ./prisma
-COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/node_modules ./node_modules
-COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/package.json ./
 
 # 切换到非 root 用户
 USER nodejs
