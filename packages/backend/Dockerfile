@@ -45,7 +45,7 @@ COPY --chown=nodejs:nodejs pnpm-workspace.yaml pnpm-lock.yaml ./
 
 # 安装生产依赖（使用 pnpm 生成正确的 symlinks）
 RUN --mount=type=cache,target=/root/.pnpm-store \
-    pnpm install --prod --frozen-lockfile
+    pnpm install --prod
 
 # 从构建阶段复制构建产物
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/dist ./dist
