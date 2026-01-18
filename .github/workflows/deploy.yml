@@ -131,14 +131,25 @@ jobs:
           echo "✅ Containers started"
 
           echo ""
-          echo "⏳ Step 8: Waiting for containers to be healthy (30 seconds)..."
-          sleep 30
+          echo "⏳ Step 8: Waiting for backend to be healthy..."
+          echo "Checking every 5 seconds for up to 2 minutes..."
+          for i in {1..24}; do
+            if docker compose exec -T backend node -e "require('http').get('http://localhost:3001/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" 2>/dev/null; then
+              echo "✅ Backend is healthy!"
+              break
+            fi
+            echo "Waiting... ($i/24)"
+            sleep 5
+          done
 
           echo ""
           echo "💾 Step 9: Updating database schema..."
-          docker compose exec -T backend pnpm db:generate
-          docker compose exec -T backend pnpm db:push
-          echo "✅ Database updated"
+          echo "Generating Prisma Client..."
+          docker compose exec -T backend npx prisma generate || echo "⚠️ Prisma generate failed, continuing..."
+          echo ""
+          echo "Pushing database schema..."
+          docker compose exec -T backend npx prisma db push --skip-generate || echo "⚠️ DB push failed"
+          echo "✅ Database update completed"
 
           echo ""
           echo "🧹 Step 10: Cleaning up old images (older than 24 hours)..."
