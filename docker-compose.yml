@@ -14,9 +14,13 @@ volumes:
 services:
   # ==================== 后端服务 ====================
   backend:
-    build:
-      context: .
-      dockerfile: ./packages/backend/Dockerfile
+    # 优先使用 GitHub Container Registry 镜像
+    image: ghcr.io/zhouzijun1111/my-blog-backend:latest
+    # 如果需要本地构建，取消下面的注释：
+    # build:
+    #   context: .
+    #   dockerfile: ./packages/backend/Dockerfile
+
     container_name: blog-backend
     restart: unless-stopped
     ports:
@@ -44,6 +48,12 @@ services:
 
       # 应用配置
       - APP_URL=${APP_URL:-http://localhost:3000}
+
+      # 速率限制配置
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-60000}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+
     volumes:
       - ./packages/backend/prisma:/app/prisma
     networks:
@@ -57,9 +67,13 @@ services:
 
   # ==================== 前端服务 ====================
   frontend:
-    build:
-      context: .
-      dockerfile: ./packages/frontend/Dockerfile
+    # 优先使用 GitHub Container Registry 镜像
+    image: ghcr.io/zhouzijun1111/my-blog-frontend:latest
+    # 如果需要本地构建，取消下面的注释：
+    # build:
+    #   context: .
+    #   dockerfile: ./packages/frontend/Dockerfile
+
     container_name: blog-frontend
     restart: unless-stopped
     ports:

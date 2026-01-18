@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@fastify/rate-limit": "9.0.0",
     "@types/rss": "^0.0.32",
     "@typescript-eslint/eslint-plugin": "^8.51.0",
     "@typescript-eslint/parser": "^8.51.0",
@@ -72,7 +73,6 @@
   },
   "dependencies": {
     "@fastify/helmet": "^13.0.2",
-    "@fastify/rate-limit": "^10.3.0",
     "isomorphic-dompurify": "^2.35.0"
   }
 }
