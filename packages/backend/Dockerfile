@@ -29,8 +29,8 @@ RUN pnpm run build
 # ==================== 生产阶段 ====================
 FROM node:18-alpine
 
-# 设置工作目录为后端目录
-WORKDIR /app/packages/backend
+# 设置工作目录
+WORKDIR /app
 
 # 安装 pnpm
 RUN npm install -g pnpm@8
@@ -43,9 +43,12 @@ COPY packages/backend/package.json ./packages/backend/
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages/backend/node_modules ./packages/backend/node_modules
 
-# 从构建阶段复制构建产物
+# 从构建阶段复制构建产物（使用绝对路径）
 COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
 COPY --from=builder /app/packages/backend/prisma ./packages/backend/prisma
+
+# 设置工作目录为后端目录
+WORKDIR /app/packages/backend
 
 # 创建非 root 用户
 RUN addgroup -g 1001 -S nodejs && \
