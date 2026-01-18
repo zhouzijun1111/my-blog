@@ -75,6 +75,7 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    timeout-minutes: 10  # 设置超时时间为 10 分钟
 
     steps:
     - name: Deploy to server via SSH
@@ -84,33 +85,75 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.SERVER_PORT }}
+        script_stop: true  # 遇到错误立即停止
+        request_pty: true  # 请求伪终端
         script: |
           set -e
 
-          echo "🔄 Pulling latest code..."
+          echo "🚀 Starting deployment at $(date)"
+          echo "=========================================="
+
+          echo "📂 Step 1: Navigate to project directory"
           cd /var/blog
+          pwd
+
+          echo ""
+          echo "📥 Step 2: Pulling latest code from GitHub..."
           git pull origin main
+          echo "✅ Code updated successfully"
 
-          echo "🔐 Logging in to GitHub Container Registry..."
+          echo ""
+          echo "🔐 Step 3: Logging in to GitHub Container Registry..."
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          echo "✅ Logged in to ghcr.io"
 
-          echo "📦 Pulling new images..."
+          echo ""
+          echo "📦 Step 4: Pulling new Docker images..."
+          echo "This may take 1-2 minutes depending on network speed..."
           docker pull ghcr.io/${{ github.repository }}-backend:latest
           docker pull ghcr.io/${{ github.repository }}-frontend:latest
+          echo "✅ Images pulled successfully"
 
-          echo "🏷️  Tagging images..."
+          echo ""
+          echo "🏷️  Step 5: Tagging images..."
           docker tag ghcr.io/${{ github.repository }}-backend:latest blog-backend:latest
           docker tag ghcr.io/${{ github.repository }}-frontend:latest blog-frontend:latest
+          echo "✅ Images tagged"
 
-          echo "🚀 Restarting services..."
+          echo ""
+          echo "🛑 Step 6: Stopping running containers..."
+          docker compose down
+          echo "✅ Containers stopped"
+
+          echo ""
+          echo "🚀 Step 7: Starting new containers..."
           docker compose up -d
+          echo "✅ Containers started"
 
-          echo "💾 Updating database..."
+          echo ""
+          echo "⏳ Step 8: Waiting for containers to be healthy (30 seconds)..."
+          sleep 30
+
+          echo ""
+          echo "💾 Step 9: Updating database schema..."
           docker compose exec -T backend pnpm db:generate
           docker compose exec -T backend pnpm db:push
+          echo "✅ Database updated"
 
-          echo "🧹 Cleaning up old images..."
-          docker image prune -af --filter "until=24h"
+          echo ""
+          echo "🧹 Step 10: Cleaning up old images (older than 24 hours)..."
+          docker image prune -af --filter "until=24h" || true
+          echo "✅ Cleanup completed"
 
-          echo "✅ Deployment completed!"
+          echo ""
+          echo "=========================================="
+          echo "📊 Final Status:"
           docker compose ps
+
+          echo ""
+          echo "📝 Container Logs:"
+          docker compose logs --tail=20
+
+          echo ""
+          echo "✅ Deployment completed successfully at $(date)!"
+          echo "🌐 Blog should be available at: http://114.132.201.84:3000"
