@@ -51,10 +51,7 @@ export const rateLimitConfig = {
  */
 export async function setupRateLimit(server: FastifyInstance) {
   // 全局限流
-  await server.register(rateLimit, {
-    ...rateLimitConfig.global,
-    name: 'global-limit'
-  })
+  await server.register(rateLimit, rateLimitConfig.global)
 
   console.log('✅ Rate limiting enabled')
 }

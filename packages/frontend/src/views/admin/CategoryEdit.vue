@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NForm, NFormItem, NInput, NButton, NGrid, NGridItem, useMessage } from 'naive-ui'
+import { NForm, NFormItem, NInput, NButton, NGrid, useMessage } from 'naive-ui'
 import { categoryApi } from '@/api'
 
 const route = useRoute()

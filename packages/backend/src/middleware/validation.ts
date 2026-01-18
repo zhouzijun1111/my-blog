@@ -23,7 +23,7 @@ export function validateBody<T extends z.ZodType>(schema: T) {
           error: {
             code: 'VALIDATION_ERROR',
             message: '请求数据验证失败',
-            details: error.errors.map(err => ({
+            details: error.issues.map(err => ({
               field: err.path.join('.'),
               message: err.message
             }))
@@ -49,7 +49,7 @@ export function validateQuery<T extends z.ZodType>(schema: T) {
           error: {
             code: 'VALIDATION_ERROR',
             message: '查询参数验证失败',
-            details: error.errors.map(err => ({
+            details: error.issues.map(err => ({
               field: err.path.join('.'),
               message: err.message
             }))

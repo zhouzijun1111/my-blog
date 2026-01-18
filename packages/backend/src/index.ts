@@ -169,7 +169,7 @@ async function start() {
     onRequest: [async (request, reply) => {
       try {
         await request.jwtVerify()
-      } catch (err) {
+      } catch (_err) {
         return reply.status(401).send({
           success: false,
           error: { code: 'UNAUTHORIZED', message: '未授权访问' }

@@ -52,6 +52,26 @@ export async function articleRoutes(fastify: FastifyInstance) {
     }
   })
 
+  // 根据 ID 获取文章详情（用于编辑）
+  fastify.get('/api/articles/by-id/:id', async (request, reply) => {
+    try {
+      const { id } = request.params as { id: string }
+      const article = await articleService.getById(id)
+      return { success: true, data: article }
+    } catch (error: any) {
+      if (error.message === '文章不存在') {
+        return reply.status(404).send({
+          success: false,
+          error: { code: 'ARTICLE_NOT_FOUND', message: error.message }
+        })
+      }
+      return reply.status(500).send({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: error.message }
+      })
+    }
+  })
+
   // 创建文章（需要认证）
   fastify.post('/api/articles', {
     onRequest: [fastify.authenticate]

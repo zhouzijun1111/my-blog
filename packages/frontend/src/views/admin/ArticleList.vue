@@ -17,13 +17,15 @@
     </div>
 
     <div v-else-if="articleStore.articles.length === 0" class="empty-state">
-      <div class="empty-icon">📝</div>
+      <div class="empty-icon">
+        <FileIcon />
+      </div>
       <h3>暂无文章</h3>
       <p>点击上方按钮创建您的第一篇文章</p>
     </div>
 
     <div v-else class="article-grid">
-      <div
+      <GlassCard
         v-for="article in articleStore.articles"
         :key="article.id"
         class="article-card"
@@ -34,11 +36,11 @@
             {{ article.published ? '已发布' : '草稿' }}
           </div>
           <div class="card-actions">
-            <button class="action-btn edit" @click="$router.push(`/admin/articles/${article.id}/edit`)">
-              ✏️
+            <button class="action-btn edit" @click="$router.push(`/admin/articles/${article.id}/edit`)" aria-label="编辑文章">
+              <EditIcon />
             </button>
-            <button class="action-btn delete" @click="handleDelete(article.id)">
-              🗑️
+            <button class="action-btn delete" @click="handleDelete(article.id)" aria-label="删除文章">
+              <DeleteIcon />
             </button>
           </div>
         </div>
@@ -49,15 +51,15 @@
 
         <div class="card-meta">
           <div class="meta-item">
-            <span class="meta-icon">📁</span>
+            <FolderIcon />
             <span>{{ article.category?.name || '未分类' }}</span>
           </div>
           <div class="meta-item">
-            <span class="meta-icon">👁️</span>
+            <EyeIcon />
             <span>{{ article.views || 0 }}</span>
           </div>
           <div class="meta-item">
-            <span class="meta-icon">📅</span>
+            <CalendarIcon />
             <span>{{ formatDate(article.createdAt) }}</span>
           </div>
         </div>
@@ -67,7 +69,7 @@
             {{ tag.name }}
           </span>
         </div>
-      </div>
+      </GlassCard>
     </div>
   </div>
 </template>
@@ -76,6 +78,13 @@
 import { onMounted } from 'vue'
 import { useArticleStore } from '@/stores/article'
 import { useMessage } from 'naive-ui'
+import GlassCard from '@/components/common/GlassCard.vue'
+import EditIcon from '@/components/icons/EditIcon.vue'
+import DeleteIcon from '@/components/icons/DeleteIcon.vue'
+import FileIcon from '@/components/icons/FileIcon.vue'
+import FolderIcon from '@/components/icons/FolderIcon.vue'
+import EyeIcon from '@/components/icons/EyeIcon.vue'
+import CalendarIcon from '@/components/icons/CalendarIcon.vue'
 
 const articleStore = useArticleStore()
 const message = useMessage()
@@ -93,7 +102,7 @@ const handleDelete = async (id: string) => {
     try {
       await articleStore.deleteArticle(id)
       message.success('文章已删除')
-    } catch (error) {
+    } catch (_error) {
       message.error('删除失败')
     }
   }
@@ -120,8 +129,10 @@ onMounted(() => {
 }
 
 .header-content h2 {
-  font-size: 1.75rem;
+  font-size: 2.25rem;
   font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
   margin-bottom: 0.25rem;
   background: var(--gradient-primary);
   -webkit-background-clip: text;
@@ -131,7 +142,7 @@ onMounted(() => {
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .create-btn {
@@ -146,7 +157,7 @@ onMounted(() => {
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-md);
   white-space: nowrap;
 }
@@ -194,9 +205,19 @@ onMounted(() => {
 }
 
 .empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  opacity: 0.3;
+  color: var(--text-secondary);
+}
+
+.empty-icon :deep(svg) {
+  width: 100%;
+  height: 100%;
 }
 
 .empty-state h3 {
@@ -217,17 +238,17 @@ onMounted(() => {
 }
 
 .article-card {
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   gap: 1rem;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.article-card:hover {
+  transform: translateY(-4px);
 }
 
 .article-card::before {
@@ -240,12 +261,7 @@ onMounted(() => {
   background: var(--gradient-primary);
   opacity: 0;
   transition: opacity 0.3s;
-}
-
-.article-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--accent-primary);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .article-card:hover::before {
@@ -254,7 +270,6 @@ onMounted(() => {
 
 .article-card.is-draft {
   opacity: 0.85;
-  background: var(--bg-secondary);
 }
 
 /* ========== 卡片头部 ========== */
@@ -292,25 +307,23 @@ onMounted(() => {
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
 }
 
-.action-btn.edit {
-  background: var(--bg-secondary);
+.action-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 .action-btn.edit:hover {
   background: var(--gradient-cool);
   color: white;
   transform: scale(1.1);
-}
-
-.action-btn.delete {
-  background: var(--bg-secondary);
 }
 
 .action-btn.delete:hover {
@@ -321,7 +334,7 @@ onMounted(() => {
 
 /* ========== 卡片内容 ========== */
 .card-title {
-  font-size: 1.15rem;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--text-primary);
   line-height: 1.4;
@@ -333,7 +346,7 @@ onMounted(() => {
 }
 
 .card-excerpt {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.6;
   display: -webkit-box;
@@ -360,8 +373,10 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
-.meta-icon {
-  font-size: 0.95rem;
+.meta-item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--accent-color);
 }
 
 /* ========== 卡片标签 ========== */
@@ -387,6 +402,10 @@ onMounted(() => {
   .header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .header-content h2 {
+    font-size: 1.75rem;
   }
 
   .create-btn {

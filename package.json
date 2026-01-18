@@ -2,6 +2,7 @@
   "name": "blog",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "pnpm --filter backend dev & pnpm --filter frontend dev",
     "dev:backend": "pnpm --filter backend dev",
@@ -15,8 +16,8 @@
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "lint": "eslint . --ext .ts,.vue,.js",
-    "lint:fix": "eslint . --ext .ts,.vue,.js --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "stylelint": "stylelint \"**/*.{css,scss,vue}\"",
@@ -41,16 +42,20 @@
     "pnpm": ">=8.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/rss": "^0.0.32",
     "@typescript-eslint/eslint-plugin": "^8.51.0",
     "@typescript-eslint/parser": "^8.51.0",
     "eslint": "^9.39.2",
     "eslint-plugin-vue": "^10.6.2",
+    "globals": "^17.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "stylelint": "^16.26.1",
     "stylelint-config-recommended-vue": "^1.6.1",
-    "stylelint-config-standard": "^39.0.1"
+    "stylelint-config-standard": "^39.0.1",
+    "vue-eslint-parser": "^10.2.0"
   },
   "lint-staged": {
     "*.{js,ts,vue}": [
@@ -67,6 +72,7 @@
   },
   "dependencies": {
     "@fastify/helmet": "^13.0.2",
+    "@fastify/rate-limit": "^10.3.0",
     "isomorphic-dompurify": "^2.35.0"
   }
 }

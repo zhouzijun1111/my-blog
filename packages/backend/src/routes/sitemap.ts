@@ -79,7 +79,7 @@ function generateSitemapXML(
 
   // 生成 XML
   const urlElements = urls.map(u => {
-    const lastmod = u.lastmod ? `  <lastmod>${u.lastmod}</lastmod>` : ''
+    const lastmod = (u as any).lastmod ? `  <lastmod>${(u as any).lastmod}</lastmod>` : ''
     return `  <url>
     <loc>${u.url}</loc>
     <changefreq>${u.changefreq}</changefreq>

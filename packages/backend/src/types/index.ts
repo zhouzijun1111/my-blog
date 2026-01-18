@@ -14,7 +14,7 @@ export interface JwtUser {
  */
 declare module 'fastify' {
   interface FastifyRequest {
-    user?: JwtUser
+    user: JwtUser | undefined
   }
 }
 

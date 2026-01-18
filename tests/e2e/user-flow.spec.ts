@@ -226,7 +226,7 @@ test.describe('用户流程测试', () => {
       await expect(articleCards).toHaveCount(3)
 
       // 验证移动端导航
-      const mobileNav = page.locator('.mobile-nav')
+      const _mobileNav = page.locator('.mobile-nav')
       // 注意：这里假设有移动端导航，实际实现可能不同
     })
 

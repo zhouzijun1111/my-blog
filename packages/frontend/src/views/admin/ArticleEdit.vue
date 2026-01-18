@@ -101,7 +101,7 @@
       <div class="actions">
         <n-button @click="previewMarkdown" size="large" class="preview-btn">
           <template #icon>
-            <span>👁️</span>
+            <EyeIcon />
           </template>
           预览
         </n-button>
@@ -141,6 +141,7 @@ import { useArticleStore } from '@/stores/article'
 import { articleApi, categoryApi, tagApi } from '@/api'
 import MarkdownIt from 'markdown-it'
 import DOMPurify from 'isomorphic-dompurify'
+import EyeIcon from '@/components/icons/EyeIcon.vue'
 
 const route = useRoute()
 const router = useRouter()

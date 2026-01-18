@@ -182,7 +182,7 @@ test.describe('核心 Web 指标测试', () => {
                 resolve(entries[0].startTime)
               }
             }).observe({ entryTypes: ['largest-contentful-paint'] })
-          } catch (e) {
+          } catch (_e) {
             // Fallback: 使用 domContentLoadedEventEnd
             resolve(
               performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
@@ -237,7 +237,7 @@ test.describe('资源加载测试', () => {
     await page.waitForLoadState('networkidle')
 
     // 检查是否使用了 WebP 或 AVIF
-    const hasModernFormat = imageFormats.some(
+    const _hasModernFormat = imageFormats.some(
       (format) => format.includes('webp') || format.includes('avif')
     )
 
@@ -251,7 +251,7 @@ test.describe('动画性能测试', () => {
     await page.goto('/')
 
     // 开始记录性能指标
-    const frames: number[] = []
+    const _frames: number[] = []
 
     await page.evaluate(() => {
       let lastTime = performance.now()

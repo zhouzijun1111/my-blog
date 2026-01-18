@@ -21,7 +21,7 @@ export async function commentRoutes(fastify: FastifyInstance) {
 
   const updateStatusSchema = z.object({
     status: z.enum(['PENDING', 'APPROVED', 'SPAM'], {
-      errorMap: () => ({ message: '状态必须是 PENDING、APPROVED 或 SPAM' })
+      message: '状态必须是 PENDING、APPROVED 或 SPAM'
     })
   })
 

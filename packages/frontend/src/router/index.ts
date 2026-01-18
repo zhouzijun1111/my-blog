@@ -118,7 +118,7 @@ router.beforeEach(async (to, from, next) => {
         await authStore.fetchUser()
       }
       next()
-    } catch (error) {
+    } catch (_error) {
       // token 无效，清除并重定向
       localStorage.removeItem('token')
       next({

@@ -34,7 +34,7 @@
 import { computed } from 'vue'
 import type { Article } from 'shared/types'
 
-const props = defineProps<{
+defineProps<{
   article: Article
 }>()
 

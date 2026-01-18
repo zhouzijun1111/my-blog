@@ -43,7 +43,7 @@ export class AuthService {
       data: { email, username, password: hashedPassword }
     })
 
-    const { password: _, ...userWithoutPassword } = user
+    const { password: _password, ...userWithoutPassword } = user
     return userWithoutPassword
   }
 
@@ -66,7 +66,7 @@ export class AuthService {
       throw new Error('邮箱或密码错误')
     }
 
-    const { password: _, ...userWithoutPassword } = user
+    const { password: _password, ...userWithoutPassword } = user
     return userWithoutPassword
   }
 
@@ -82,7 +82,7 @@ export class AuthService {
       throw new Error('用户不存在')
     }
 
-    const { password: _, ...userWithoutPassword } = user
+    const { password: _password, ...userWithoutPassword } = user
     return userWithoutPassword
   }
 }

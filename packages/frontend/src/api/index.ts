@@ -10,7 +10,7 @@ export const articleApi = {
     api.get<any, ApiResponse<Article>>(`/articles/${slug}`),
 
   getById: (id: string) =>
-    api.get<any, ApiResponse<Article>>(`/articles/${id}`),
+    api.get<any, ApiResponse<Article>>(`/articles/by-id/${id}`),
 
   create: (data: Partial<Article>) =>
     api.post<any, ApiResponse<Article>>('/articles', data),

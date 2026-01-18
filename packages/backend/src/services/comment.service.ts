@@ -96,7 +96,7 @@ export class CommentService {
     })
 
     // 返回时排除敏感信息
-    const { article: articleData, ...commentWithoutArticle } = comment
+    const { article: _articleData, ...commentWithoutArticle } = comment
     return commentWithoutArticle
   }
 
